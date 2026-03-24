@@ -1,0 +1,72 @@
+Answers to questions:
+1. ImageProcessor - this class intends to apply different operations on an image. There is a dependency
+relationship between this class and the image class that represents an image.
+SubImgCharMatcher - this class intends to match between an image and a character according to their
+brightness. It uses the class CharConverter that converts a character to a "binary" image in order to compute
+it's brightness.
+AsciiArtAlgorithm - this class is in charge of running the asciiArt algorithm. It has an arrayList of sub
+images(dependency to the image class). The class uses the ImageProcessor class to compute brightness of the
+sub images. The class has an (composition) instance of SubImgCharMatcher to match between the sub images and
+characters.
+InvalidCommandException - this class represents exceptions of invalid commands written by the user(either
+command doesn't exist or parameters that are in the right format but can't be used).
+IncorrectFormatException - this class represents exceptions od commands that their parameters are in incorrect
+format.
+KeyboardInput - class for reading input from the user.
+AsciiOutput - a class implementing this interface can output a 2D array of chars in some fashion.
+ConsoleAsciiOutput - a class implementing the AsciiOutput interface. It Outputs a 2D array of chars to the
+console.
+HtmlAsciiOutput - a class implementing the AsciiOutput interface. It Outputs a 2D array of chars to an HTML
+file viewable in a web browser.
+Shell - Class intended for user interface where he can change parameters for asciiArt and execute it.
+It has a dependency relationship with the AsciiArtAlgorithm so when the user writes the command asciiArt, it
+can run the asciiArt algorithm and represent the result in the output he picks. The output(html or console) is
+a field of the Shell class and that is why there is a composition relationship. The class uses KeyboardInput
+to read the user's commands and it uses InvalidCommandException and IncorrectFormatException to print errors
+to the user in case of incorrect or invalid command(relationship of dependency).
+The Shell class has a data member of the padded image(composition) and it uses ImageProcessor class to pad an
+image given by the user(dependency).
+The shell has a data member that is an instance of SubImgCharMatcher for adding and removing characters from
+it according to user's choice(composition).
+
+2. In SubImgCharMatcher I used 2 arrays of doubles that are in the size of the number of ascii characters so
+the program won't have to compute brightness of characters every time(the brightness of characters doesn't
+change).
+one array represents the characters used for matching and their brightnesses and the other represents all
+characters that were ever computed by the class and their brightness.
+I chose to use this data structure because I know the Maximum size of the array, and each character has a
+unique number between 32-126. So this way, I save memory because I don't need to save the actual characters,
+and the size is fixed, so time complexity should probably be better than arrayList for example. Adding and
+removing a character and it's brightness using array is O(1). Also finding brightness according to character
+is O(1).
+I also keep a TreeMap from normalized brightness to a priority queue of characters. The reason for using this
+data structure is because we don't want to have to normalize the characters brightness if the charset has not
+changed. In order to do that we want to save a map between characters and their brightness. We would want to
+find the closest character to an image by the normalized brightness. A good way to do that is to use a tree
+map where the normalized brightnesses are keys. The time complexity is O(log(n)) where n is the number of
+different normalized brightnesses. When we find the closest one, we want the lowest ascii character and that
+is why we use a Priority Queue where getting the minimum character value is O(1). Removing and adding an entry
+of normalized brightness and character is O(log(n+m)) where m is the number of characters used for matching
+and n is the number of different brightnesses.
+When dividing an image to sub images, I used an arrayList because the sub images need to be ordered so we will
+know what character to put in what position when we match between the characters and the sub images. Inserting
+elements to it is O(1)* and accessing by the index is O(1). We don't use find and remove in it so the time
+complexity is good.
+
+3. I used the exception mechanism in the run function of the Shell class. When the user has written an
+invalid command(wither incorrect format or command isn't in the list of commands or command has invalid
+parameters) I threw an instance of the relevant exception class that I have created and caught the exception
+to print out it's message.
+
+4. I added another function to the SubImgCharMatcher called getCharsUsed(). This function was needed in my
+code because the class Shell has an instance of the SubImgCharMatcher that is in charge of adding and removing
+characters for matching with image. When the user would want to see the characters used, the only way to do
+that is if we have a function for getting these characters.
+
+
+
+
+
+
+
+
