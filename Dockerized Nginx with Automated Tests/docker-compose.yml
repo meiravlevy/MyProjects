@@ -1,0 +1,23 @@
+# .env file choice: 
+# Environment variables are kept in this file to seperate configuration 
+# from code and simplify environment-specific changes. 
+# Nginx by default does not support environment variables, and adding 
+# support would require templating which would make the image more complex.
+services:
+  nginx_server:
+    build: ./nginx
+    ports:
+      - ${SERVER_SSL_PORT}:${SERVER_SSL_PORT}
+    container_name: ${NGINX_HOST}
+  test:
+    build: ./tests
+    depends_on:
+      - nginx_server
+    ports:
+      - ${SERVER_HTML_PORT}:${SERVER_HTML_PORT}
+      - ${SERVER_ERROR_PORT}:${SERVER_ERROR_PORT}
+    environment:
+      NGINX_HOST: ${NGINX_HOST}
+      SERVER_HTML_PORT:  ${SERVER_HTML_PORT}
+      SERVER_ERROR_PORT: ${SERVER_ERROR_PORT}
+    container_name: ${TEST_HOST}
