@@ -1,0 +1,58 @@
+Answers to questions:
+1. The design I picked for part 1.7 is sending an instance of brickerGameManager to hte constructor of the
+strategy.
+The advantages of using this approach is that it helps encapsulation by leaving the responsibility of
+adding and removing game objects to brickerGameManager only. This could prevent bugs in the code.
+On the other hand, The rest of the API of brickerGameManager can be seen by the brick strategy, and some of it
+isn't needed by the strategy.
+
+2. The way I implemented the display of the player's lives in the game is by creating two classes: one ofr the
+ numerical life renderer and one for the graphical life renderer.
+ In the brickerGameManager class I kept a Counter object of the current number of lives in the game and a
+ function that returns the counter's value and the function is used by the twolife rendering classes.
+ The numerical life renderer is in charge of displaying the current number of lives in the game in text.
+ The graphical life renderer is incharge of displaying the current number of lives in the game graphically.
+
+ 3. The Brick strategies are all implementing a collision strategy interface, meaning that on collision each
+ one of them applies a different strategy behaviour. In brickerGameManager class there is a Counter object for
+ the current number of bricks in the game that is sent to the brick strategies together with an instance of
+ brickerGameManager.
+ BasicCollisionStrategy - on collision of brick with another game object, removes the brick using the
+ brickerGameManager and decrements the current number of bricks in the game by one.
+ MoreBallsStrategy - on collision of brick with another game object, creates two pucks(using the original ball
+ and it's attributes needed for creating a puck, that are passed to the constructor of the strategy). The
+ pucks are created with the constructor of Ball.
+ Then, the brick is removed and the current number of bricks in the game is decremented by one.
+ AddPaddleStrategy - for this strategy I have created a class SecondaryPaddle for the secondary paddle, that
+ the strategy will add to the game. This class uses composition. It has a game object that it is created
+ according to and moves according to.
+ The strategy checks with brickerGameManager instance if there isn't a secondary paddle in the game
+ currently, and if so, it creates a secondary paddle(with mai paddle sent to it's constructor). Then, it
+ removes the brick from the game and decrements the number of current bricks by one similarly to
+ basicCollisionStrategy.
+ ChangeCameraStrategy - the object to follow(in this case the main ball) is sent to the constructor of the
+ strategy. The brickerGameManager instance checks that there isn't a change of camera activated already and
+ the tag of the ball is checked to see that the main ball is the one that collided with the brick. If so, then
+ we set the camera to follow the main ball. We remove the brick and decrement the number of bricks by
+ one.
+ AddLifeStrategy - For this strategy, I added a class called fallingLife for the lives that we need to fall
+ down from the brick. The class increases the number of lives once it collides with the main paddle of the
+ game.
+ The AddLifeStrategy gets in the constructor a Counter object of the current number of lives in the game.
+ On collision of brick with another game object, it creates a FallingLife game object using the constant heart
+ image path and width of the life rendered in the graphical renderer.
+ it adds the falling life to the game and sets it's position and velocity. Then, the brick is removed and the
+ current number of lives in the game is decremented by 1.
+
+4. For the behaviour of double strategy, I implemented a double strategy class that has an array of collision
+  strategies that are sent to it's constructor. On collision with the brick, we go over the array and activate
+  the strategy onCollision function.
+  Limiting the double strategy to have no more than 3 special strategies was done in the BrickStrategyFactory
+  class. if a special strategy needs to be picked, the buildStrategy function creates a Counter object
+  containing the number of double strategies for the brick. Then we have a private functions for picking a
+  special brick strategy. If the special strategy that is picked is a double strategy, we check first that the
+   number of double strategies isn't 2. if so, we increment the counter by one and create a double strategy
+   that again picks two special strategies. If another double strategy is picked, then the counter is again
+   incremented by one and the next time we pick a special strategy, it will go into the if condition, and
+   will pick between 4 options of special strategies(that don't include the option of double strategy) which
+   is done by generating a random integer between 0 to 40 instead of 0 to 50.
